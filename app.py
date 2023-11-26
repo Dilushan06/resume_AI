@@ -33,10 +33,30 @@ def insert_data(name,email,res_score,timestamp,no_of_pages,reco_field,cand_level
     rec_values = (name, email, str(res_score), timestamp,str(no_of_pages), reco_field, cand_level, skills,recommended_skills,courses)
     cursor.execute(insert_sql, rec_values)
 
-st.set_page_config(
-   page_title="AI Resume Analyzer",
-   page_icon='./Logo/logo2.png',
-)
+def pdf_reader(file):
+    resource_manager = PDFResourceManager()
+    fake_file_handle = io.StringIO()
+    converter = TextConverter(resource_manager, fake_file_handle, laparams=LAParams())
+    page_interpreter = PDFPageInterpreter(resource_manager, converter)
+    with open(file, 'rb') as fh:
+        for page in PDFPage.get_pages(fh,
+                                      caching=True,
+                                      check_extractable=True):
+            page_interpreter.process_page(page)
+            print(page)
+        text = fake_file_handle.getvalue()
+
+    # close open handles
+    converter.close()
+    fake_file_handle.close()
+    return text
+
+def show_pdf(file_path):
+    with open(file_path, "rb") as f:
+        base64_pdf = base64.b64encode(f.read()).decode('utf-8')
+    pdf_display = F'<iframe src="data:application/pdf;base64,{base64_pdf}" width="700" height="1000" type="application/pdf"></iframe>'
+    st.markdown(pdf_display, unsafe_allow_html=True)
+
 
 # Create the DB
 db_sql = """CREATE DATABASE IF NOT EXISTS resume;"""
@@ -60,6 +80,10 @@ table_sql = "CREATE TABLE IF NOT EXISTS " + DB_table_name + """
                 """
 cursor.execute(table_sql)
 
+st.set_page_config(
+   page_title="AI Resume Analyzer",
+   page_icon='./Logo/logo2.png',
+)
 
 def run():
     img = Image.open('./Logo/logo2.png')
@@ -67,7 +91,7 @@ def run():
     st.title("AI Resume Analyser")
     st.sidebar.markdown("# Choose User")
     activities = ["User", "Admin"]
-    choice = st.sidebar.selectbox("Choose among the given options:", activities)
+    choice = st.sidebar.selectbox("Choose among users:", activities)
 
     if choice == 'User':
         st.markdown('''<h5 style='text-align: left; color: #021659;'> Upload your resume, and get smart recommendations</h5>''',
@@ -76,14 +100,14 @@ def run():
         if pdf_file is not None:
             with st.spinner('Uploading your Resume...'):
                 time.sleep(4)
-            save_image_path = './Uploaded_Resumes/'+pdf_file.name
-            with open(save_image_path, "wb") as f:
+            saved_pdf = './Uploaded_Resume/'+pdf_file.name
+            with open(saved_pdf, "wb") as f:
                 f.write(pdf_file.getbuffer())
-            show_pdf(save_image_path)
-            resume_data = ResumeParser(save_image_path).get_extracted_data()
+            show_pdf(saved_pdf)
+            resume_data = ResumeParser(saved_pdf).get_extracted_data()
             if resume_data:
                 ## Get the whole resume data
-                resume_text = pdf_reader(save_image_path)
+                resume_text = pdf_reader(saved_pdf)
 
                 st.header("**Resume Analysis**")
                 st.success("Hello "+ resume_data['name'])
@@ -105,6 +129,25 @@ def run():
                 elif resume_data['no_of_pages'] >=3:
                     cand_level = "Experienced"
                     st.markdown('''<h4 style='text-align: left; color: #fba171;'>You are at experience level!''',unsafe_allow_html=True)
+
+                
+                # st.subheader("**Skills Recommendation💡**")
+                ## Skill shows
+                keywords = st_tags(label='### Your Current Skills',
+                text='See our skills recommendation below',
+                    value=resume_data['skills'],key = '1  ')
+
+                ##  keywords
+                ds_keyword = ['tensorflow','keras','pytorch','machine learning','deep Learning','flask','streamlit']
+                web_keyword = ['react', 'django', 'node jS', 'react js', 'php', 'laravel', 'magento', 'wordpress',
+                               'javascript', 'angular js', 'c#', 'flask']
+                android_keyword = ['android','android development','flutter','kotlin','xml','kivy']
+                ios_keyword = ['ios','ios development','swift','cocoa','cocoa touch','xcode']
+                uiux_keyword = ['ux','adobe xd','figma','zeplin','balsamiq','ui','prototyping','wireframes','storyframes','adobe photoshop','photoshop','editing','adobe illustrator','illustrator','adobe after effects','after effects','adobe premier pro','premier pro','adobe indesign','indesign','wireframe','solid','grasp','user research','user experience']
+
+                recommended_skills = []
+                reco_field = ''
+                rec_course = ''
 
 
 run()
