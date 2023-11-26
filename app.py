@@ -149,5 +149,39 @@ def run():
                 reco_field = ''
                 rec_course = ''
 
+                resume_score = 0
+                if 'Objective' in resume_text:
+                    resume_score = resume_score+20
+
+                if 'Declaration'  in resume_text:
+                    resume_score = resume_score + 20
+
+                if 'Hobbies' or 'Interests'in resume_text:
+                    resume_score = resume_score + 20
+
+                if 'Achievements' in resume_text:
+                    resume_score = resume_score + 20
+
+                if 'Projects' in resume_text:
+                    resume_score = resume_score + 20
+                    
+                st.subheader("**Resume Score📝**")
+                st.markdown(
+                    """
+                    <style>
+                        .stProgress > div > div > div > div {
+                            background-color: #d73b5c;
+                        }
+                    </style>""",
+                    unsafe_allow_html=True,
+                )
+                my_bar = st.progress(0)
+                score = 0
+                for percent_complete in range(resume_score):
+                    score +=1
+                    time.sleep(0.1)
+                    my_bar.progress(percent_complete + 1)
+                st.success('** Your Resume Writing Score: ' + str(score)+'**')
+
 
 run()
