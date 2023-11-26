@@ -14,12 +14,7 @@ import io,random
 from streamlit_tags import st_tags
 from PIL import Image
 import pymysql
-from courses import ds_course,web_course,android_course,ios_course,uiux_course
 
-# import pafy #for uploading youtube videos
-import plotly.express as px #to create visualisations at the admin session
-import nltk
-#nltk.download('stopwords')
 
 
 #CONNECT TO DATABASE
@@ -164,7 +159,7 @@ def run():
 
                 if 'Projects' in resume_text:
                     resume_score = resume_score + 20
-                    
+
                 st.subheader("**Resume Score📝**")
                 st.markdown(
                     """
