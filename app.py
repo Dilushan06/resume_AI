@@ -112,6 +112,7 @@ def run():
                     st.text('Email: ' + resume_data['email'])
                     st.text('Contact: ' + resume_data['mobile_number'])
                     st.text('Resume pages: '+str(resume_data['no_of_pages']))
+                    st.text('Name: '+resume_data['degree'] )
                 except:
                     pass
                 cand_level = ''
@@ -128,9 +129,8 @@ def run():
                 
                 # st.subheader("**Skills Recommendation💡**")
                 ## Skill shows
-                keywords = st_tags(label='### Your Current Skills',
-                text='See our skills recommendation below',
-                    value=resume_data['skills'],key = '1  ')
+                keywords = st_tags(label='### Your Current Skills', value=resume_data['skills'],key = '1  ')
+                st.text('Recommended skills for you....')
 
                 ##  keywords
                 ds_keyword = ['tensorflow','keras','pytorch','machine learning','deep Learning','flask','streamlit']
@@ -138,23 +138,94 @@ def run():
                                'javascript', 'angular js', 'c#', 'flask']
                 android_keyword = ['android','android development','flutter','kotlin','xml','kivy']
                 ios_keyword = ['ios','ios development','swift','cocoa','cocoa touch','xcode']
-                uiux_keyword = ['ux','adobe xd','figma','zeplin','balsamiq','ui','prototyping','wireframes','storyframes','adobe photoshop','photoshop','editing','adobe illustrator','illustrator','adobe after effects','after effects','adobe premier pro','premier pro','adobe indesign','indesign','wireframe','solid','grasp','user research','user experience']
+                uiux_keyword = ['ux','adobe xd','figma','zeplin','balsamiq','ui','prototyping','wireframes','storyframes',
+                                'adobe photoshop','photoshop','editing','adobe illustrator','illustrator','adobe after effects',
+                                'after effects','adobe premier pro','premier pro','adobe indesign','indesign','wireframe','solid','grasp','user research','user experience']
 
                 recommended_skills = []
                 reco_field = ''
                 rec_course = ''
 
+
+                 ## Courses recommendation
+                for i in resume_data['skills']:
+                    ## Data science recommendation
+                    if i.lower() in ds_keyword:
+                        print(i.lower())
+                        reco_field = 'Data Science'
+                        st.success("** Our analysis says you are looking for Data Science Jobs.**")
+                        recommended_skills = ['Data Visualization','Predictive Analysis','Statistical Modeling','Data Mining','Clustering & Classification','Data Analytics','Quantitative Analysis','Web Scraping','ML Algorithms','Keras','Pytorch','Probability','Scikit-learn','Tensorflow',"Flask",'Streamlit']
+                        recommended_keywords = st_tags(label='### Recommended skills for you.',
+                        text='Recommended skills generated from System',value=recommended_skills,key = '2')
+                        st.markdown('''<h4 style='text-align: left; color: #1ed760;'>Adding this skills to resume will boost🚀 the chances of getting a Job</h4>''',unsafe_allow_html=True)
+                        #rec_course = course_recommender(ds_course)
+                        break
+
+                    ## Web development recommendation
+                    elif i.lower() in web_keyword:
+                        print(i.lower())
+                        reco_field = 'Web Development'
+                        st.success("** Our analysis says you are looking for Software Development Jobs **")
+                        recommended_skills = ['React','Django','Node JS','React JS','php','laravel','Magento','wordpress','Javascript','Angular JS','c#','Flask','SDK']
+                        recommended_keywords = st_tags(label='### Recommended skills for you.',
+                        text='Recommended skills generated from System',value=recommended_skills,key = '3')
+                        st.markdown('''<h4 style='text-align: left; color: #1ed760;'>Adding this skills to resume will boost🚀 the chances of getting a Job💼</h4>''',unsafe_allow_html=True)
+                        #rec_course = course_recommender(web_course)
+                        break
+
+                    ## Android App Development
+                    elif i.lower() in android_keyword:
+                        print(i.lower())
+                        reco_field = 'Android Development'
+                        st.success("** Our analysis says you are looking for Android App Development Jobs **")
+                        recommended_skills = ['Android','Android development','Flutter','Kotlin','XML','Java','Kivy','GIT','SDK','SQLite']
+                        recommended_keywords = st_tags(label='### Recommended skills for you.',
+                        text='Recommended skills generated from System',value=recommended_skills,key = '4')
+                        st.markdown('''<h4 style='text-align: left; color: #1ed760;'>Adding this skills to resume will boost🚀 the chances of getting a Job💼</h4>''',unsafe_allow_html=True)
+                        # rec_course = course_recommender(android_course)
+                        break
+
+                    ## IOS App Development
+                    elif i.lower() in ios_keyword:
+                        print(i.lower())
+                        reco_field = 'IOS Development'
+                        st.success("** Our analysis says you are looking for IOS App Development Jobs **")
+                        recommended_skills = ['IOS','IOS Development','Swift','Cocoa','Cocoa Touch','Xcode','Objective-C','SQLite','Plist','StoreKit',"UI-Kit",'AV Foundation','Auto-Layout']
+                        recommended_keywords = st_tags(label='### Recommended skills for you.',
+                        text='Recommended skills generated from System',value=recommended_skills,key = '5')
+                        st.markdown('''<h4 style='text-align: left; color: #1ed760;'>Adding this skills to resume will boost🚀 the chances of getting a Job💼</h4>''',unsafe_allow_html=True)
+                        #rec_course = course_recommender(ios_course)
+                        break
+
+                    ## Ui-UX Recommendation
+                    elif i.lower() in uiux_keyword:
+                        print(i.lower())
+                        reco_field = 'UI-UX Development'
+                        st.success("** Our analysis says you are looking for UI-UX Development Jobs **")
+                        recommended_skills = ['UI','User Experience','Adobe XD','Figma','Zeplin','Balsamiq','Prototyping','Wireframes','Storyframes','Adobe Photoshop','Editing','Illustrator','After Effects','Premier Pro','Indesign','Wireframe','Solid','Grasp','User Research']
+                        recommended_keywords = st_tags(label='### Recommended skills for you.',
+                        text='Recommended skills generated from System',value=recommended_skills,key = '6')
+                        st.markdown('''<h4 style='text-align: left; color: #1ed760;'>Adding this skills to resume will boost🚀 the chances of getting a Job💼</h4>''',unsafe_allow_html=True)
+                        #rec_course = course_recommender(uiux_course)
+                        break
+
+                ## Insert into table
+                ts = time.time()
+                cur_date = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d')
+                cur_time = datetime.datetime.fromtimestamp(ts).strftime('%H:%M:%S')
+                timestamp = str(cur_date+'_'+cur_time)
+
                 resume_score = 0
-                if 'Objective' in resume_text:
+                if 'Objective' or 'ABOUT ME' or 'Details' in resume_text:
                     resume_score = resume_score+20
 
-                if 'Declaration'  in resume_text:
+                if 'Education'  in resume_text:
                     resume_score = resume_score + 20
 
-                if 'Hobbies' or 'Interests'in resume_text:
+                if 'Hobbies' or 'Interest' or 'Interests' in resume_text:
                     resume_score = resume_score + 20
 
-                if 'Achievements' in resume_text:
+                if 'Achievements' or 'Certificates' or 'Experience' in resume_text:
                     resume_score = resume_score + 20
 
                 if 'Projects' in resume_text:
@@ -177,6 +248,12 @@ def run():
                     time.sleep(0.1)
                     my_bar.progress(percent_complete + 1)
                 st.success('** Your Resume Writing Score: ' + str(score)+'**')
+                
+                insert_data(resume_data['name'], resume_data['email'], str(resume_score), timestamp,
+                              str(resume_data['no_of_pages']), reco_field, cand_level, str(resume_data['skills']),
+                              str(recommended_skills), str(rec_course))
+
+
 
 
 run()
